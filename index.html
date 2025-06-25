@@ -1,0 +1,195 @@
+<html>
+<head>
+<title>lined</title>  <div class="ruled-paper-body" contenteditable="true">
+</head>
+<body>
+
+
+<article>1</article>
+
+<style>
+body, p, h2, h1 {
+  margin: 0;
+  color: #333;
+}
+body {
+  font-family: arial, sans-serif;
+  font-size: 150%;
+  line-height: 1.2;
+  background-image: -webkit-linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px);
+  background-image: -moz-linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(0,0,0,.1) 1px, transparent 1px);
+  background-size: 100% 1.2em; /* match the line-height */
+  background-position: 0 1em;
+  background-origin: content-box;
+  padding: 1em auto;
+}
+header {
+  background: #fff;
+  border-bottom: solid 1px rgba(0,0,0,.1);
+  padding-left: 2.5em;
+}
+h1 {
+  padding-left: 1.2rem;
+  padding-top: 1.1em;
+  border-left: 2px solid pink;
+}
+article {
+  margin: 0 1em 0 10em;
+  border-left: 2px solid pink;
+}
+p {
+  padding: 0 0 1.8rem 1rem;
+}
+h2 {
+  padding: 1.2rem 0 1.2rem 1rem;
+}
+</style>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, 
+                initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Advanced Alarm Clock</title>
+</head>
+
+<body>
+    <div class="clock">
+        
+        <div class="time" id="time">
+            00:00:00
+        </div>
+        <div class="input-row">
+            <div class="input-field">
+                <label for="alarmDate">
+                    Select Date:
+                </label>
+                <input type="date"
+                    id="alarmDate"
+                    class="alarm-input"
+                    min="">
+            </div>
+            <div class="input-field">
+                <label for="alarmTime">
+                    Select Time:
+                </label>
+                <input type="time" id="alarmTime"
+                    class="alarm-input">
+            </div>
+            <button id="setAlarm">
+                Set Alarm
+            </button>
+        </div>
+        <div class="alarms" id="alarms">
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+<script>
+let time = document.getElementById("time");
+let dateInput = document.getElementById("alarmDate");
+let tInput = document.getElementById("alarmTime");
+let btn = document.getElementById("setAlarm");
+let contan = document.getElementById("alarms");
+let interVal;
+let maxValue = 3;
+let cnt = 0;
+let almTimesArray = [];
+function timeChangeFunction() {
+    let curr = new Date();
+    let hrs = curr.getHours();
+    let min = String(curr.getMinutes()).padStart(2, "0");
+    let sec = String(curr.getSeconds()).padStart(2, "0");
+    let period = "AM";
+    if (hrs >= 12) {
+        period = "PM";
+        if (hrs > 12) {
+            hrs -= 12;
+        }
+    }
+    hrs = String(hrs).padStart(2, "0");
+    time.textContent = `${hrs}:${min}:${sec} ${period}`;
+}
+function alarmSetFunction() {
+    let now = new Date();
+    let selectedDate = new Date(dateInput.value + "T" + tInput.value);
+    if (selectedDate <= now) {
+        alert(`Invalid time. Please select 
+    a future date and time.`);
+        return;
+    }
+    if (almTimesArray.includes(selectedDate.toString())) {
+        alert(`You cannot set multiple 
+    alarms for the same time.`);
+        return;
+    }
+    if (cnt < maxValue) {
+        let timeUntilAlarm = selectedDate - now;
+        let alarmDiv = document.createElement("div");
+        alarmDiv.classList.add("alarm");
+        alarmDiv.innerHTML = `
+            <span>
+            ${selectedDate.toLocaleString()}
+            </span>
+            <button class="delete-alarm">
+            Delete
+            </button>
+        `;
+        alarmDiv
+            .querySelector(".delete-alarm")
+            .addEventListener("click", () => {
+                alarmDiv.remove();
+                cnt--;
+                clearTimeout(interVal);
+                const idx = almTimesArray.indexOf(selectedDate.toString());
+                if (idx !== -1) {
+                    almTimesArray.splice(idx, 1);
+                }
+            });
+        interVal = setTimeout(() => {
+            alert("Time to review");
+            alarmDiv.remove();
+            cnt--;
+            const alarmIndex = almTimesArray.indexOf(selectedDate.toString());
+            if (alarmIndex !== -1) {
+                almTimesArray.splice(alarmIndex, 1);
+            }
+        }, timeUntilAlarm);
+        contan.appendChild(alarmDiv);
+        cnt++;
+        almTimesArray.push(selectedDate.toString());
+    } else {
+        alert("You can only set a maximum of 3 alarms.");
+    }
+}
+function showAlarmFunction() {
+    let alarms = contan.querySelectorAll(".alarm");
+    alarms.forEach((alarm) => {
+        let deleteButton = alarm.querySelector(".delete-alarm");
+        deleteButton.addEventListener("click", () => {
+            alarmDiv.remove();
+            cnt--;
+            clearTimeout(interVal);
+            const alarmIndex = almTimesArray.indexOf(selectedDate.toString());
+            if (alarmIndex !== -1) {
+                almTimesArray.splice(alarmIndex, 1);
+            }
+        });
+    });
+}
+showAlarmFunction();
+setInterval(timeChangeFunction, 1000);
+btn.addEventListener("click", alarmSetFunction);
+timeChangeFunction();
+</script>
+
+</html>
+
+
+</body>
+</html>
